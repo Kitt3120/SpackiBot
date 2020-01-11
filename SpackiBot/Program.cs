@@ -4,9 +4,11 @@ namespace SpackiBot
 {
     class Program
     {
+        public static SpackiBot SpackiBot { get; private set; }
+
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            SpackiBot = new SpackiBot();
         }
     }
 }
