@@ -44,8 +44,6 @@ namespace SpackiBot
             sw.Stop();
             _localSection.Info($"SpackiBot started, took {sw.ElapsedMilliseconds}ms to start.");
 
-            ModuleManager mm = ServiceProvider.GetService<ModuleManager>();
-
             //Keep main thread alive so program doesn't close
             _localSection.Debug("Keeping program alive");
             while (_running)
