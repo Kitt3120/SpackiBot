@@ -14,14 +14,13 @@ using System.Threading.Tasks;
 
 namespace SpackiBot
 {
-    class SpackiBot
+    internal class SpackiBot
     {
         private LoggingSection _localSection;
         private LoggingSection _discordSection;
 
         public IServiceProvider ServiceProvider { get; private set; }
         public DiscordSocketClient Discord { get; private set; }
-        public ModuleManager ModuleManager { get; private set; }
         private bool _running = false;
 
         public static string DiscordToken { get; private set; } = "Nope";
@@ -52,7 +51,7 @@ namespace SpackiBot
 
         private async Task SetupDiscord()
         {
-            using(LoggingSection section = _localSection.CreateChild("Discord-Setup"))
+            using (LoggingSection section = _localSection.CreateChild("Discord-Setup"))
             {
                 section.Verbose("Reached Discord-Setup");
 
@@ -84,11 +83,14 @@ namespace SpackiBot
                 section.Debug("Adding SpackiBot-Instance to ServiceCollection");
                 serviceCollection.AddSingleton(this);
 
+                section.Debug("Adding DiscordSocketClient to ServiceCollection");
+                serviceCollection.AddSingleton(Discord);
+
                 section.Debug("Adding CommandService to ServiceCollection");
                 CommandService commandService = new CommandService(new CommandServiceConfig()
                 {
                     CaseSensitiveCommands = false,
-                    DefaultRunMode = RunMode.Sync
+                    DefaultRunMode = RunMode.Async
                 });
                 serviceCollection.AddSingleton(commandService);
 

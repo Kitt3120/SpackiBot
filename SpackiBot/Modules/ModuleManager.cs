@@ -1,9 +1,11 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using SpackiBot.Logging;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -30,22 +32,26 @@ namespace SpackiBot.Modules
         //From https://docs.stillu.cc/guides/commands/intro.html
         public async Task InstallCommandsAsync()
         {
-            // Hook the MessageReceived event into our command handler
+            // Hook the MessageReceived event into our command handler - Edited: Run every handle in a new Task so we won't block the Gateway-Thread
+            //_spackiBot.Discord.MessageReceived += (msg) => { Task.Run(() => HandleCommandAsync(msg)); return Task.CompletedTask; }; ;
             _spackiBot.Discord.MessageReceived += HandleCommandAsync;
 
-            // Here we discover all of the command modules in the entry 
-            // assembly and load them. Starting from Discord.NET 2.0, a
-            // service provider is required to be passed into the
-            // module registration method to inject the 
-            // required dependencies.
-            //
-            // If you do not use Dependency Injection, pass null.
-            // See Dependency Injection guide for more information.
-            await _commandService.AddModulesAsync(assembly: Assembly.GetEntryAssembly(), services: _spackiBot.ServiceProvider);
+            // Hook the CommandExecuted event for logging
+            _commandService.CommandExecuted += CommandExecuted;
+            /*
+             * Here we discover all of the command modules in the entry assembly and load them.
+             * Starting from Discord.NET 2.0, a service provider is required to be passed into the module registration method to inject the required dependencies
+             * 
+             * As stated on docs.stillu.cc: 
+             * Loading Modules Automatically
+             * The Command Service can automatically discover all classes in an Assembly that inherit ModuleBase and load them. Invoke CommandService.AddModulesAsync to discover modules and install them.
+             * To opt a module out of auto-loading, flag it with DontAutoLoadAttribute.
+            */
+            await _commandService.AddModulesAsync(Assembly.GetEntryAssembly(), _spackiBot.ServiceProvider);
         }
 
         //From https://docs.stillu.cc/guides/commands/intro.html
-        private async Task HandleCommandAsync(SocketMessage socketMessage)
+        public async Task HandleCommandAsync(SocketMessage socketMessage)
         {
             // Don't process the command if it was a system message
             var message = socketMessage as SocketUserMessage;
@@ -67,6 +73,13 @@ namespace SpackiBot.Modules
             // Execute the command with the command context we just
             // created, along with the service provider for precondition checks.
             await _commandService.ExecuteAsync(context, argPos, _spackiBot.ServiceProvider);
+        }
+
+        private Task CommandExecuted(Optional<CommandInfo> info, ICommandContext context, IResult result)
+        {
+            if (info.IsSpecified && !result.IsSuccess)
+                _localSection.Warning($"Command {info.Value.Name} fired in {context.Guild.Name}/{context.Channel.Name} by {context.User.Username} did not run successfully: {result.ErrorReason}");
+            return Task.CompletedTask;
         }
     }
 }
