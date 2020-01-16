@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SpackiBot.Logging;
 using SpackiBot.Modules;
 using SpackiBot.Services;
+using SpackiBot.Services.AssetService;
 using System;
 using System.Diagnostics;
 using System.Threading;

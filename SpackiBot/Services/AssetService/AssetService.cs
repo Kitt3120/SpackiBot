@@ -1,11 +1,10 @@
 ﻿using SpackiBot.Logging;
-using SpackiBot.Services.AssetsService;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SpackiBot.Services
+namespace SpackiBot.Services.AssetService
 {
     public class AssetService : AssetFolder
     {

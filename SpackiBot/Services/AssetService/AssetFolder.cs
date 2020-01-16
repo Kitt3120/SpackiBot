@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace SpackiBot.Services.AssetsService
+namespace SpackiBot.Services.AssetService
 {
     public class AssetFolder
     {
