@@ -12,27 +12,30 @@ namespace SpackiBot.Modules.Fun.Tyler1
     [Alias(new string[] { "t", "deformed" })]
     public class Tyler1Module : ModuleBase<SocketCommandContext>
     {
-        [Name("tyler")]
+        [Name("Tyler")]
         [Command()]
         [Summary("Tyler motherfucking one")]
         public async Task Tyler()
         {
-            await Context.Message.DeleteAsync();
-            await ReplyAsync("Tyler motherfucking one");
+            Task deleteAsync = Context.Message.DeleteAsync();
+            Task replyAsync = ReplyAsync("Tyler motherfucking one");
+
+            await deleteAsync;
+            await replyAsync;
         }
 
-        [Command("play")]
+        [Command("Play")]
         [Summary("Spielt einen Tyler1-Sound in deinem Voice-Channel")]
         public async Task PlayAsync([Summary("(Optional) Filter für bestimmten Sound")] string filter = null)
         {
-            await Task.Delay(1);
+            await ReplyAsync("Dieses Feature muss noch programmiert werden!");
         }
 
-        [Command("quote")]
+        [Command("Quote")]
         [Summary("Gibt ein Tyler1-Zitat aus")]
         public async Task QuoteAsync([Summary("(Optional) Filter für bestimmtes Zitat")] string filter = null)
         {
-            await ReplyAsync("Test");
+            await ReplyAsync("Dieses Feature muss noch programmiert werden!");
         }
     }
 }
