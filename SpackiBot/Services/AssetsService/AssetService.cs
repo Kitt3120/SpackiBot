@@ -5,11 +5,11 @@ using System.Text;
 
 namespace SpackiBot.Services
 {
-    public class AssetsService
+    public class AssetService
     {
         public string ProjectRoot { get; private set; }
 
-        public AssetsService()
+        public AssetService()
         {
             ProjectRoot = AppContext.BaseDirectory.Substring(0, AppContext.BaseDirectory.IndexOf("bin"));
         }

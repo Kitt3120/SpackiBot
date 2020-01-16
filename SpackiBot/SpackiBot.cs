@@ -84,8 +84,8 @@ namespace SpackiBot
                 section.Debug("Adding SpackiBot-Instance to ServiceCollection");
                 serviceCollection.AddSingleton(this);
 
-                section.Debug("Adding AssetsService to ServiceCollection");
-                serviceCollection.AddSingleton(new AssetsService());
+                section.Debug("Adding AssetService to ServiceCollection");
+                serviceCollection.AddSingleton(new AssetService());
 
                 section.Debug("Adding DiscordSocketClient to ServiceCollection");
                 serviceCollection.AddSingleton(Discord);
