@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace SpackiBot
 {
-    internal class SpackiBot
+    public class SpackiBot
     {
         private LoggingSection _localSection;
         private LoggingSection _discordSection;
@@ -103,6 +103,9 @@ namespace SpackiBot
 
                 section.Debug("Building ServiceProvider");
                 ServiceProvider = serviceCollection.BuildServiceProvider();
+
+                //First build ServiceProvider, then create modules (InstallCommandsAsync()) so ServiceProvider is ready to resolve for modules
+                ServiceProvider.GetService<ModuleManager>().InstallCommandsAsync().GetAwaiter().GetResult();
             }
         }
 

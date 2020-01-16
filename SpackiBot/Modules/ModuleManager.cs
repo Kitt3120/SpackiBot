@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace SpackiBot.Modules
 {
-    class ModuleManager
+    internal class ModuleManager
     {
         private LoggingSection _localSection;
 
@@ -25,8 +25,6 @@ namespace SpackiBot.Modules
 
             _spackiBot = spackiBot;
             _commandService = commandService;
-
-            InstallCommandsAsync().GetAwaiter().GetResult();
         }
 
         //From https://docs.stillu.cc/guides/commands/intro.html
@@ -41,8 +39,8 @@ namespace SpackiBot.Modules
             /*
              * Here we discover all of the command modules in the entry assembly and load them.
              * Starting from Discord.NET 2.0, a service provider is required to be passed into the module registration method to inject the required dependencies
-             * 
-             * As stated on docs.stillu.cc: 
+             *
+             * As stated on docs.stillu.cc:
              * Loading Modules Automatically
              * The Command Service can automatically discover all classes in an Assembly that inherit ModuleBase and load them. Invoke CommandService.AddModulesAsync to discover modules and install them.
              * To opt a module out of auto-loading, flag it with DontAutoLoadAttribute.
