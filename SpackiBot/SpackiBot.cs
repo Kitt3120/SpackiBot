@@ -6,6 +6,7 @@ using SpackiBot.Logging;
 using SpackiBot.Modules;
 using SpackiBot.Services;
 using SpackiBot.Services.AssetService;
+using SpackiBot.Services.FFmpeg;
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -82,9 +83,6 @@ namespace SpackiBot
                 section.Debug("Adding SpackiBot-Instance to ServiceCollection");
                 serviceCollection.AddSingleton(this);
 
-                section.Debug("Adding AssetService to ServiceCollection");
-                serviceCollection.AddSingleton(new AssetService());
-
                 section.Debug("Adding DiscordSocketClient to ServiceCollection");
                 serviceCollection.AddSingleton(Discord);
 
@@ -98,6 +96,13 @@ namespace SpackiBot
 
                 section.Debug("Creating ModuleManager");
                 serviceCollection.AddSingleton(new ModuleManager(this, commandService));
+
+                section.Debug("Adding AssetService to ServiceCollection");
+                AssetService assetService = new AssetService();
+                serviceCollection.AddSingleton(assetService);
+
+                section.Debug("Adding FFmpegService to ServiceCollection");
+                serviceCollection.AddSingleton(new FFmpegService(assetService));
 
                 section.Debug("Building ServiceProvider");
                 ServiceProvider = serviceCollection.BuildServiceProvider();

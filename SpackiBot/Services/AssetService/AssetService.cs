@@ -6,14 +6,21 @@ using System.Threading.Tasks;
 
 namespace SpackiBot.Services.AssetService
 {
-    public class AssetService : AssetFolder
+    public class AssetService : AssetFolder, IServiceStatus
     {
         private LoggingSection _loggingSection;
 
+        private ServiceStatus _serviceStatus;
+        ServiceStatus IServiceStatus.ServiceStatus { get => _serviceStatus; }
+
         public AssetService() : base(null, Path.Combine(AppContext.BaseDirectory.Substring(0, AppContext.BaseDirectory.IndexOf("bin")), "Assets"))
         {
+            _serviceStatus = ServiceStatus.Starting;
+
             _loggingSection = new LoggingSection("AssetService");
             _loggingSection.Verbose($"Loaded {SubFolders.Count} AssetFolders");
+
+            _serviceStatus = ServiceStatus.Enabled;
         }
 
         public AssetFolder FindSub(string path, StringComparison stringComparison) => FindSub(path.Split(Path.DirectorySeparatorChar), stringComparison);

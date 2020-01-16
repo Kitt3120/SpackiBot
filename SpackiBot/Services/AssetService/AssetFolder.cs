@@ -12,6 +12,8 @@ namespace SpackiBot.Services.AssetService
         public List<AssetFolder> SubFolders { get; private set; }
         public List<string> Files { get; private set; }
 
+        private Random _random;
+
         public DirectoryInfo Information { get; private set; }
 
         public AssetFolder(AssetFolder parentFolder, string directory)
@@ -21,6 +23,8 @@ namespace SpackiBot.Services.AssetService
 
             RefreshSubs();
             RefreshFiles();
+
+            _random = new Random();
         }
 
         public void RefreshSubs()
@@ -40,5 +44,13 @@ namespace SpackiBot.Services.AssetService
         public List<AssetFolder> FilterSubs(string filter, StringComparison stringComparison) => SubFolders.Where(assetFolder => assetFolder.Information.Name.Contains(filter, stringComparison)).ToList();
 
         public List<string> FilterFiles(string filter, StringComparison stringComparison) => Files.Where(file => file.Contains(filter, stringComparison)).ToList();
+
+        public string RandomFile()
+        {
+            if (Files.Count == 0)
+                return null;
+
+            return Files[_random.Next(Files.Count)];
+        }
     }
 }
