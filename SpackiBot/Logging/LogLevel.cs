@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SpackiBot.Logging
+﻿namespace SpackiBot.Logging
 {
-    enum LogLevel
+    internal enum LogLevel
     {
         //
         // Zusammenfassung:

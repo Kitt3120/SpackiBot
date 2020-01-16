@@ -1,17 +1,9 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord.Commands.Builders;
-using Discord.WebSocket;
-using SpackiBot.Logging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualBasic;
-using System.Collections.Immutable;
-using System.Security.Cryptography;
 
 namespace SpackiBot.Modules.Help
 {

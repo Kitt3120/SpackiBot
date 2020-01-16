@@ -2,11 +2,7 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using SpackiBot.Logging;
-using System;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Reflection.Metadata;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SpackiBot.Modules
