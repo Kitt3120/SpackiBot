@@ -4,6 +4,7 @@ using Discord.Commands;
 using SpackiBot.Logging;
 using SpackiBot.Services.AssetService;
 using SpackiBot.Services.FFmpeg;
+using SpackiBot.Services.VoiceService;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
@@ -24,18 +25,15 @@ namespace SpackiBot.Modules.Fun.Tyler1
         private LoggingSection _loggingSection;
 
         private AssetService _assetService;
-        private AssetFolder _assetFolder;
-        private FFmpegService _FFmpegService;
+        private VoiceService _voiceService;
 
         private ModuleStatus _moduleStatus;
-        private ConcurrentQueue<(SocketCommandContext, string)> _requestQueue;
-        private Thread _requestQueueWorker;
-        private bool _isWorking;
+        private AssetFolder _assetFolder;
 
-        public Tyler1Module(AssetService assetService, FFmpegService FFmpegService)
+        public Tyler1Module(AssetService assetService, VoiceService voiceService)
         {
             _assetService = assetService;
-            _FFmpegService = FFmpegService;
+            _voiceService = voiceService;
 
             _moduleStatus = ModuleStatus.Starting;
             _loggingSection = new LoggingSection("Module Tyler1");
@@ -50,62 +48,7 @@ namespace SpackiBot.Modules.Fun.Tyler1
                 _loggingSection.Error($"Could not find folder for Tyler1 sounds.");
             }
 
-            _requestQueue = new ConcurrentQueue<(SocketCommandContext, string)>();
-            //IsBackground = true lets the thread automatically shutdown on program exit, so we don't have to handle it anymore
-            _requestQueueWorker = new Thread(HandleQueue) { IsBackground = true };
-            _isWorking = false;
-
-            _requestQueueWorker.Start();
             _moduleStatus = ModuleStatus.Enabled;
-        }
-
-        private async void HandleQueue(object obj)
-        {
-            while (true)
-            {
-                if (!_isWorking)
-                {
-                    if (_requestQueue.TryDequeue(out (SocketCommandContext, string) result))
-                    {
-                        _isWorking = true;
-                        _loggingSection.Debug("Begin");
-                        SocketCommandContext context = result.Item1;
-                        string file = result.Item2;
-
-                        try
-                        {
-                            IVoiceChannel voiceChannel = (context.User as IGuildUser).VoiceChannel;
-                            _loggingSection.Debug("Got voice");
-                            _loggingSection.Debug("Playing...");
-                            if (voiceChannel == null)
-                                await (await context.User.GetOrCreateDMChannelAsync()).SendMessageAsync("Deine Anfrage wurde übersprungen, da du in keinem VoiceChannel mehr warst!");
-                            else
-                                await PlayInVoiceAsync(voiceChannel, file);
-                        }
-                        catch (Exception)
-                        {
-                            throw;
-                        }
-                        finally
-                        {
-                            _loggingSection.Debug("FINALLY");
-                            _isWorking = false;
-                        }
-                    }
-                }
-            }
-        }
-
-        private async Task PlayInVoiceAsync(IVoiceChannel voiceChannel, string file)
-        {
-            using (var audioClient = await voiceChannel.ConnectAsync())
-            using (var ffmpeg = _FFmpegService.ReadAudio(file))
-            using (var output = ffmpeg.StandardOutput.BaseStream)
-            using (var audioStream = audioClient.CreatePCMStream(AudioApplication.Mixed))
-            {
-                try { await output.CopyToAsync(audioStream); }
-                finally { await audioStream.FlushAsync(); }
-            }
         }
 
         [Name("Tyler")]
@@ -135,9 +78,9 @@ namespace SpackiBot.Modules.Fun.Tyler1
                 await ReplyAsync("Die gewünschte Tyler1-Quote wurde leider nicht gefunden oder ist noch nicht in meiner Datenbank registriert");
             else
             {
-                if (_isWorking)
+                if (_voiceService.IsWorking)
                     _ = ReplyAsync("Tyler ist gerade beschäftigt, aber er wird schon bald auch bei dir vorbeischauen!");
-                _requestQueue.Enqueue((Context, file));
+                _voiceService.Request(new VoiceRequest(Context.User, (Context.User as IGuildUser).VoiceChannel, file));
             }
         }
 

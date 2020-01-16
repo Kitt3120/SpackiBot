@@ -7,6 +7,7 @@ using SpackiBot.Modules;
 using SpackiBot.Services;
 using SpackiBot.Services.AssetService;
 using SpackiBot.Services.FFmpeg;
+using SpackiBot.Services.VoiceService;
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -24,6 +25,8 @@ namespace SpackiBot
         private bool _running = false;
 
         public static string DiscordToken { get; private set; } = "Nope";
+
+        //TODO: Multi-Guild support, fix Tyler play on invalid command parameters
 
         public SpackiBot()
         {
@@ -102,7 +105,11 @@ namespace SpackiBot
                 serviceCollection.AddSingleton(assetService);
 
                 section.Debug("Adding FFmpegService to ServiceCollection");
-                serviceCollection.AddSingleton(new FFmpegService(assetService));
+                FFmpegService FFmpegService = new FFmpegService(assetService);
+                serviceCollection.AddSingleton(FFmpegService);
+
+                section.Debug("Adding VoiceService to ServiceCollection");
+                serviceCollection.AddSingleton(new VoiceService(FFmpegService));
 
                 section.Debug("Building ServiceProvider");
                 ServiceProvider = serviceCollection.BuildServiceProvider();
