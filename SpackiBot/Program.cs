@@ -1,12 +1,10 @@
-﻿using System;
-
-namespace SpackiBot
+﻿namespace SpackiBot
 {
-    class Program
+    internal class Program
     {
         public static SpackiBot SpackiBot { get; private set; }
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             SpackiBot = new SpackiBot();
         }

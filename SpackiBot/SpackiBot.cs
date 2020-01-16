@@ -4,17 +4,15 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using SpackiBot.Logging;
 using SpackiBot.Modules;
+using SpackiBot.Services;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SpackiBot
 {
-    internal class SpackiBot
+    public class SpackiBot
     {
         private LoggingSection _localSection;
         private LoggingSection _discordSection;
@@ -83,6 +81,9 @@ namespace SpackiBot
                 section.Debug("Adding SpackiBot-Instance to ServiceCollection");
                 serviceCollection.AddSingleton(this);
 
+                section.Debug("Adding AssetService to ServiceCollection");
+                serviceCollection.AddSingleton(new AssetService());
+
                 section.Debug("Adding DiscordSocketClient to ServiceCollection");
                 serviceCollection.AddSingleton(Discord);
 
@@ -99,6 +100,9 @@ namespace SpackiBot
 
                 section.Debug("Building ServiceProvider");
                 ServiceProvider = serviceCollection.BuildServiceProvider();
+
+                //First build ServiceProvider, then create modules (InstallCommandsAsync()) so ServiceProvider is ready to resolve for modules
+                ServiceProvider.GetService<ModuleManager>().InstallCommandsAsync().GetAwaiter().GetResult();
             }
         }
 

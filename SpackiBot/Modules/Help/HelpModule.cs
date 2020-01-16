@@ -1,14 +1,9 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord.Commands.Builders;
-using Discord.WebSocket;
-using SpackiBot.Logging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace SpackiBot.Modules.Help
 {
@@ -22,9 +17,9 @@ namespace SpackiBot.Modules.Help
             _commandService = commandService;
         }
 
-        [Command("help")]
+        [Command("Help")]
         [Alias(new string[] { "h", "how", "?" })]
-        [Summary("Shows available commands and their description")]
+        [Summary("Zeigt verfügbare Befehle mit ihren Parametern und Beschreibungen")]
         public async Task HelpAsync()
         {
             try
@@ -34,10 +29,10 @@ namespace SpackiBot.Modules.Help
                     .WithAuthor(Context.Client.CurrentUser)
                     .WithTitle("Befehle")
                     .WithDescription("Auflistung der Befehle von SpackiBot:")
-                    .WithFooter(footer => footer.Text = "You have no mana!")
+                    .WithFooter(footer => footer.Text = "YOU HAVE NO MANA!")
                     .WithCurrentTimestamp();
 
-                foreach (var module in _commandService.Modules)
+                foreach (var module in _commandService.Modules.OrderBy(module => module.Name))
                 {
                     StringBuilder descriptionBuilder = new StringBuilder();
                     foreach (var cmd in module.Commands)
@@ -45,8 +40,10 @@ namespace SpackiBot.Modules.Help
                         var result = await cmd.CheckPreconditionsAsync(Context);
                         if (result.IsSuccess)
                         {
-                            descriptionBuilder.AppendLine($"{cmd.Name} [{string.Join(", ", cmd.Aliases.Where(alias => Array.IndexOf(cmd.Aliases.ToArray(), alias) != 0))}]");
-                            descriptionBuilder.AppendLine(cmd.Summary);
+                            descriptionBuilder.AppendLine($"{cmd.Name}:");
+                            for (int i = 0; i < cmd.Parameters.Count; i++)
+                                descriptionBuilder.AppendLine($"> Parameter {i + 1}: {cmd.Parameters[i].Name} - {cmd.Parameters[i].Summary}");
+                            descriptionBuilder.AppendLine($"> {cmd.Summary}");
                             descriptionBuilder.AppendLine();
                         }
                     }
@@ -56,7 +53,7 @@ namespace SpackiBot.Modules.Help
                     {
                         builder.AddField(field =>
                         {
-                            field.Name = module.Name;
+                            field.Name = $"Module {module.Name}{(module.Aliases == null || module.Aliases.Count == 1 ? "" : " [" + string.Join(", ", module.Aliases.Where(alias => Array.IndexOf(module.Aliases.ToArray(), alias) != 0)) + "]")}";
                             field.Value = description;
                             field.IsInline = false;
                         });
