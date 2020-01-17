@@ -73,21 +73,35 @@ namespace SpackiBot.Modules.Fun.Tyler1
                 return;
             }
 
+            if (Context.IsPrivate)
+            {
+                await ReplyAsync("Du kannst dies nur in einem Server tun!");
+                return;
+            }
+
+            IVoiceChannel mentionedChannel = Context.Message.MentionedChannels.Where(channel => channel is IVoiceChannel).FirstOrDefault() as IVoiceChannel;
+
             string file = (filter == null ? _assetFolder.RandomFile() : _assetFolder.FilterFiles(filter, StringComparison.OrdinalIgnoreCase).FirstOrDefault());
             if (file == null)
                 await ReplyAsync("Die gewünschte Tyler1-Quote wurde leider nicht gefunden oder ist noch nicht in meiner Datenbank registriert");
             else
             {
                 if (_voiceService.IsWorking)
-                    _ = ReplyAsync("Tyler ist gerade beschäftigt, aber er wird schon bald auch bei dir vorbeischauen!");
-                _voiceService.Request(new VoiceRequest(Context.User, (Context.User as IGuildUser).VoiceChannel, file));
+                    _ = ReplyAsync("Ich bin gerade noch beschäftigt, doch deine Anfrage wurde eingereiht!");
+                _voiceService.Request(new VoiceRequest(Context.User as IGuildUser, null, file));
             }
         }
 
         [Command("Quote")]
-        [Summary("Gibt ein Tyler1-Zitat aus")]
+        [Summary("Gibt ein Tyler1-Zitat im Quote-Channel aus")]
         public async Task QuoteAsync([Summary("(Optional) Filter für bestimmtes Zitat")] [Remainder] string filter = null)
         {
+            if (Context.IsPrivate)
+            {
+                await ReplyAsync("Du kannst dies nur in einem Server tun!");
+                return;
+            }
+
             await ReplyAsync("Dieses Feature muss noch programmiert werden!");
         }
     }
