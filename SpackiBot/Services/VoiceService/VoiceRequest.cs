@@ -7,11 +7,11 @@ namespace SpackiBot.Services.VoiceService
 {
     public class VoiceRequest
     {
-        public IUser Requestor { get; }
-        public IVoiceChannel VoiceChannel { get; }
+        public IGuildUser Requestor { get; }
+        public IVoiceChannel VoiceChannel { get; private set; }
         public string File { get; }
 
-        public VoiceRequest(IUser requestor, IVoiceChannel voiceChannel, string file)
+        public VoiceRequest(IGuildUser requestor, IVoiceChannel voiceChannel, string file)
         {
             Requestor = requestor;
             VoiceChannel = voiceChannel;
@@ -21,20 +21,12 @@ namespace SpackiBot.Services.VoiceService
         public async Task<bool> IsValidAsync()
         {
             if (VoiceChannel == null)
-                return false;
-
-            bool contains = false;
-            List<IReadOnlyCollection<IGuildUser>> userCollections = await VoiceChannel.GetUsersAsync().ToList();
-            foreach (IReadOnlyCollection<IUser> userCollection in userCollections)
             {
-                foreach (IUser user in userCollection)
-                {
-                    if (user.Id == Requestor.Id)
-                        contains = true;
-                }
+                await Requestor.Guild.DownloadUsersAsync();
+                VoiceChannel = Requestor.VoiceChannel;
+                return VoiceChannel != null;
             }
-
-            return contains;
+            else return true;
         }
     }
 }
