@@ -52,23 +52,20 @@ namespace SpackiBot.Services.VoiceService
                     if (_requestQueue.TryDequeue(out VoiceRequest voiceRequest))
                     {
                         IsWorking = true;
-                        _loggingSection.Debug("Begin");
 
                         try
                         {
-                            _loggingSection.Debug("Got voice");
-                            _loggingSection.Debug("Playing...");
-
                             if (!(await voiceRequest.IsValidAsync()))
                                 await (await voiceRequest.Requestor.GetOrCreateDMChannelAsync()).SendMessageAsync("Deine Anfrage wurde übersprungen, da du in keinem VoiceChannel mehr warst!");
                             else
                                 await PlayInVoiceAsync(voiceRequest.VoiceChannel, voiceRequest.File);
                         }
                         catch (Exception)
-                        { }
+                        {
+                            throw;
+                        }
                         finally
                         {
-                            _loggingSection.Debug("FINALLY");
                             IsWorking = false;
                         }
                     }
