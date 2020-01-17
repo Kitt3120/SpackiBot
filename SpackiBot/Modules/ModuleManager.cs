@@ -72,7 +72,7 @@ namespace SpackiBot.Modules
         private Task CommandExecuted(Optional<CommandInfo> info, ICommandContext context, IResult result)
         {
             if (info.IsSpecified && !result.IsSuccess)
-                _localSection.Warning($"Command {info.Value.Name} fired in , {(context.Channel is IGuildChannel ? context.Guild.Name + "/" : "")}{context.Channel.Name} by {context.User.Username} did not run successfully: {result.ErrorReason}");
+                _localSection.Warning($"Command {info.Value.Name} fired in {(context.Channel is IGuildChannel ? context.Guild.Name + "/" : "")}{context.Channel.Name} by {context.User.Username} did not run successfully: {result.ErrorReason}");
             return Task.CompletedTask;
         }
     }

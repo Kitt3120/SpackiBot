@@ -79,14 +79,12 @@ namespace SpackiBot.Modules.Fun.Tyler1
                 return;
             }
 
-            IVoiceChannel mentionedChannel = Context.Message.MentionedChannels.Where(channel => channel is IVoiceChannel).FirstOrDefault() as IVoiceChannel;
-
             string file = (filter == null ? _assetFolder.RandomFile() : _assetFolder.FilterFiles(filter, StringComparison.OrdinalIgnoreCase).FirstOrDefault());
             if (file == null)
                 await ReplyAsync("Die gewünschte Tyler1-Quote wurde leider nicht gefunden oder ist noch nicht in meiner Datenbank registriert");
             else
             {
-                if (_voiceService.IsWorking)
+                if (_voiceService.GetVoiceRequestQueue(Context.Guild).IsWorking)
                     _ = ReplyAsync("Ich bin gerade noch beschäftigt, doch deine Anfrage wurde eingereiht!");
                 _voiceService.Request(new VoiceRequest(Context.User as IGuildUser, null, file));
             }
