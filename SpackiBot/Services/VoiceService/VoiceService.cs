@@ -15,15 +15,14 @@ namespace SpackiBot.Services.VoiceService
     public class VoiceService : IServiceStatus
     {
         public ServiceStatus ServiceStatus => _serviceStatus;
-        public bool IsWorking { get; private set; }
 
         private LoggingSection _loggingSection;
 
         private FFmpegService _FFmpegService;
 
         private ServiceStatus _serviceStatus;
-        private ConcurrentQueue<VoiceRequest> _requestQueue;
-        private Thread _requestQueueWorker;
+        private ConcurrentDictionary<IGuild, VoiceRequestQueueHandler> _voiceRequestQueues;
+        private Thread _queueWorker;
 
         public VoiceService(FFmpegService FFmpegService)
         {
@@ -32,48 +31,45 @@ namespace SpackiBot.Services.VoiceService
 
             _FFmpegService = FFmpegService;
 
-            _requestQueue = new ConcurrentQueue<VoiceRequest>();
+            _voiceRequestQueues = new ConcurrentDictionary<IGuild, VoiceRequestQueueHandler>();
             //IsBackground = true lets the thread automatically shutdown on program exit, so we don't have to handle it anymore
-            _requestQueueWorker = new Thread(HandleQueue) { IsBackground = true };
-            IsWorking = false;
+            _queueWorker = new Thread(HandleQueue) { IsBackground = true };
 
-            _requestQueueWorker.Start();
+            _queueWorker.Start();
             _serviceStatus = ServiceStatus.Enabled;
         }
 
-        public void Request(VoiceRequest voiceRequest) => _requestQueue.Enqueue(voiceRequest);
+        public VoiceRequestQueueHandler GetVoiceRequestQueue(IGuild guild)
+        {
+            VoiceRequestQueueHandler queue;
+            if (_voiceRequestQueues.ContainsKey(guild))
+                queue = _voiceRequestQueues[guild];
+            else
+            {
+                queue = new VoiceRequestQueueHandler(this, guild);
+                _voiceRequestQueues[guild] = queue;
+            }
 
-        private async void HandleQueue(object obj)
+            return queue;
+        }
+
+        public void Request(VoiceRequest voiceRequest) => GetVoiceRequestQueue(voiceRequest.Requestor.Guild).Enqueue(voiceRequest);
+
+        private void HandleQueue(object obj)
         {
             while (true)
             {
-                if (!IsWorking)
+                foreach (var pair in _voiceRequestQueues)
                 {
-                    if (_requestQueue.TryDequeue(out VoiceRequest voiceRequest))
-                    {
-                        IsWorking = true;
+                    VoiceRequestQueueHandler queue = pair.Value;
 
-                        try
-                        {
-                            if (!(await voiceRequest.IsValidAsync()))
-                                await (await voiceRequest.Requestor.GetOrCreateDMChannelAsync()).SendMessageAsync("Deine Anfrage wurde übersprungen, da du in keinem VoiceChannel mehr warst!");
-                            else
-                                await PlayInVoiceAsync(voiceRequest.VoiceChannel, voiceRequest.File);
-                        }
-                        catch (Exception)
-                        {
-                            throw;
-                        }
-                        finally
-                        {
-                            IsWorking = false;
-                        }
-                    }
+                    if (!queue.IsWorking)
+                        _ = queue.HandleNext();
                 }
             }
         }
 
-        private async Task PlayInVoiceAsync(IVoiceChannel voiceChannel, string file)
+        public async Task PlayInVoiceAsync(IVoiceChannel voiceChannel, string file)
         {
             using (var audioClient = await voiceChannel.ConnectAsync())
             using (var ffmpeg = _FFmpegService.ReadAudio(file))
