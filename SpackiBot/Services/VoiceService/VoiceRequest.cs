@@ -20,6 +20,9 @@ namespace SpackiBot.Services.VoiceService
 
         public async Task<bool> IsValidAsync()
         {
+            if (VoiceChannel == null)
+                return false;
+
             bool contains = false;
             List<IReadOnlyCollection<IGuildUser>> userCollections = await VoiceChannel.GetUsersAsync().ToList();
             foreach (IReadOnlyCollection<IUser> userCollection in userCollections)
