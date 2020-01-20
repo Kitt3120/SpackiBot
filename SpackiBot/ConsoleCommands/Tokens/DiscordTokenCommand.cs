@@ -1,8 +1,4 @@
-﻿using SpackiBot.Properties;
-using System;
-using System.Security.Cryptography;
-
-using SpackiBot.Properties;
+﻿using System;
 
 namespace SpackiBot.ConsoleCommands.Tokens
 {

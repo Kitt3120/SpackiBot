@@ -7,7 +7,6 @@ using SpackiBot.ConsoleCommands;
 using SpackiBot.Logging;
 using SpackiBot.Modules;
 using SpackiBot.Properties;
-using SpackiBot.Services;
 using SpackiBot.Services.AssetService;
 using SpackiBot.Services.FFmpeg;
 using SpackiBot.Services.VoiceService;

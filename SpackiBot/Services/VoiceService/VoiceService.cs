@@ -1,12 +1,8 @@
 ﻿using Discord;
 using Discord.Audio;
-using Discord.Commands;
 using SpackiBot.Logging;
 using SpackiBot.Services.FFmpeg;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 

@@ -1,16 +1,11 @@
 ﻿using Discord;
-using Discord.Audio;
 using Discord.Commands;
 using SpackiBot.Logging;
 using SpackiBot.Services.AssetService;
-using SpackiBot.Services.FFmpeg;
 using SpackiBot.Services.VoiceService;
 using System;
-using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
-using System.Reflection.Metadata;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace SpackiBot.Modules.Fun.Tyler1

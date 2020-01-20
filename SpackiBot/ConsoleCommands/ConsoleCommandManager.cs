@@ -1,12 +1,7 @@
-﻿using Discord.Commands;
-using Microsoft.Extensions.DependencyInjection;
-using SpackiBot.Logging;
+﻿using SpackiBot.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Reflection.Metadata;
-using System.Text;
 
 namespace SpackiBot.ConsoleCommands
 {
