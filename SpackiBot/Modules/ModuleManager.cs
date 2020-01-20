@@ -13,14 +13,16 @@ namespace SpackiBot.Modules
 
         private SpackiBot _spackiBot;
         private CommandService _commandService;
+        private DiscordSocketClient _discordSocketClient;
 
-        public ModuleManager(SpackiBot spackiBot, CommandService commandService)
+        public ModuleManager(SpackiBot spackiBot, CommandService commandService, DiscordSocketClient discordSocketClient)
         {
             _localSection = new LoggingSection("Module-Manager");
             _localSection.Verbose("Reached Module-Manager");
 
             _spackiBot = spackiBot;
             _commandService = commandService;
+            _discordSocketClient = discordSocketClient;
         }
 
         //From https://docs.stillu.cc/guides/commands/intro.html
@@ -28,7 +30,7 @@ namespace SpackiBot.Modules
         {
             // Hook the MessageReceived event into our command handler - Edited: Run every handle in a new Task so we won't block the Gateway-Thread
             //_spackiBot.Discord.MessageReceived += (msg) => { Task.Run(() => HandleCommandAsync(msg)); return Task.CompletedTask; }; ;
-            _spackiBot.Discord.MessageReceived += HandleCommandAsync;
+            _discordSocketClient.MessageReceived += HandleCommandAsync;
 
             // Hook the CommandExecuted event for logging
             _commandService.CommandExecuted += CommandExecuted;
@@ -57,12 +59,12 @@ namespace SpackiBot.Modules
 
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
             if (!(message.HasCharPrefix('!', ref argPos) ||
-                message.HasMentionPrefix(_spackiBot.Discord.CurrentUser, ref argPos)) ||
+                message.HasMentionPrefix(_discordSocketClient.CurrentUser, ref argPos)) ||
                 message.Author.IsBot)
                 return;
 
             // Create a WebSocket-based command context based on the message
-            var context = new SocketCommandContext(_spackiBot.Discord, message);
+            var context = new SocketCommandContext(_discordSocketClient, message);
 
             // Execute the command with the command context we just
             // created, along with the service provider for precondition checks.
