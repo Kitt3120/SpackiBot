@@ -21,7 +21,7 @@ namespace SpackiBot.Services.VoiceService
         private FFmpegService _FFmpegService;
 
         private ServiceStatus _serviceStatus;
-        private ConcurrentDictionary<IGuild, VoiceRequestQueueHandler> _voiceRequestQueues;
+        private ConcurrentDictionary<IGuild, VoiceRequestHandler> _voiceRequestQueues;
         private Thread _queueWorker;
 
         public VoiceService(FFmpegService FFmpegService)
@@ -31,22 +31,22 @@ namespace SpackiBot.Services.VoiceService
 
             _FFmpegService = FFmpegService;
 
-            _voiceRequestQueues = new ConcurrentDictionary<IGuild, VoiceRequestQueueHandler>();
-            //IsBackground = true lets the thread automatically shutdown on program exit, so we don't have to handle it anymore
-            _queueWorker = new Thread(HandleQueue) { IsBackground = true };
+            _voiceRequestQueues = new ConcurrentDictionary<IGuild, VoiceRequestHandler>();
+
+            _queueWorker = new Thread(HandleQueue) { IsBackground = true }; //IsBackground = true lets the thread automatically shutdown on program exit, so we don't have to handle it anymore
 
             _queueWorker.Start();
             _serviceStatus = ServiceStatus.Enabled;
         }
 
-        public VoiceRequestQueueHandler GetVoiceRequestQueue(IGuild guild)
+        public VoiceRequestHandler GetVoiceRequestQueue(IGuild guild)
         {
-            VoiceRequestQueueHandler queue;
+            VoiceRequestHandler queue;
             if (_voiceRequestQueues.ContainsKey(guild))
                 queue = _voiceRequestQueues[guild];
             else
             {
-                queue = new VoiceRequestQueueHandler(this, guild);
+                queue = new VoiceRequestHandler(this, guild);
                 _voiceRequestQueues[guild] = queue;
             }
 
@@ -61,7 +61,7 @@ namespace SpackiBot.Services.VoiceService
             {
                 foreach (var pair in _voiceRequestQueues)
                 {
-                    VoiceRequestQueueHandler queue = pair.Value;
+                    VoiceRequestHandler queue = pair.Value;
 
                     if (!queue.IsWorking)
                         _ = queue.HandleNext();
