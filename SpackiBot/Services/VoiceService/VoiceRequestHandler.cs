@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SpackiBot.Services.VoiceService
 {
-    public class VoiceRequestQueueHandler
+    public class VoiceRequestHandler
     {
         public IGuild Guild { get; }
         public bool IsWorking { get; private set; }
@@ -15,7 +15,7 @@ namespace SpackiBot.Services.VoiceService
         private VoiceService _voiceService;
         private ConcurrentQueue<VoiceRequest> _requestQueue;
 
-        public VoiceRequestQueueHandler(VoiceService voiceService, IGuild guild)
+        public VoiceRequestHandler(VoiceService voiceService, IGuild guild)
         {
             _voiceService = voiceService;
             _requestQueue = new ConcurrentQueue<VoiceRequest>();
