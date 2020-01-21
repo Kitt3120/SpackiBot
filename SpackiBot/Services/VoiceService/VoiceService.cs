@@ -2,6 +2,7 @@
 using Discord.Audio;
 using SpackiBot.Logging;
 using SpackiBot.Services.FFmpeg;
+using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
@@ -51,7 +52,7 @@ namespace SpackiBot.Services.VoiceService
 
         public void Request(VoiceRequest voiceRequest) => GetVoiceRequestQueue(voiceRequest.Requestor.Guild).Enqueue(voiceRequest);
 
-        private void HandleQueue(object obj)
+        private void HandleQueue()
         {
             while (true)
             {
@@ -73,6 +74,10 @@ namespace SpackiBot.Services.VoiceService
             using (var audioStream = audioClient.CreatePCMStream(AudioApplication.Mixed))
             {
                 try { await output.CopyToAsync(audioStream); }
+                catch (Exception e)
+                {
+                    _loggingSection.Error($"Failed to play Audio in {voiceChannel.Guild.Name}/{voiceChannel.Name}: {e.Message}");
+                }
                 finally { await audioStream.FlushAsync(); }
             }
         }
