@@ -28,8 +28,6 @@ namespace SpackiBot
         private ConsoleCommandManager _consoleCommandManager;
         private bool _running = false;
 
-        //TODO: fix Tyler play on invalid command parameters
-
         public SpackiBot()
         {
             _localSection = new LoggingSection("SpackiBot");
