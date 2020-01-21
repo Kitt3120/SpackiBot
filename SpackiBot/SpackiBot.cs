@@ -61,10 +61,7 @@ namespace SpackiBot
 
             //Also keeps main thread alive so program doesn't close
             while (_running)
-            {
                 _consoleCommandManager.Handle(Console.ReadLine());
-                Thread.Sleep(1000); //Otherwise sometimes it will still be stuck in this loop as _running is still true
-            }
         }
 
         private void CheckSettings()

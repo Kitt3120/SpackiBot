@@ -21,7 +21,7 @@ namespace SpackiBot.ConsoleCommands.Administration
 
         public void Run(string[] args)
         {
-            _spackiBot.Shutdown();
+            _spackiBot.Shutdown().GetAwaiter().GetResult();
         }
     }
 }
