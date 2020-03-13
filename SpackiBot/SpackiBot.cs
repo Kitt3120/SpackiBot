@@ -106,7 +106,6 @@ namespace SpackiBot
 
                 while (!ready)
                     await Task.Delay(100);
-                //await Task.Delay(1000); //After the bot started, even after Ready-Event has been fired, it still needs some preparation time. This is a known "bug" and Task.Delay(3000); is a nice work-around.
             }
         }
 
